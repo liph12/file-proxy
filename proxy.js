@@ -2,9 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const request = require("request");
 const axios = require("axios");
+const bodyParser = require("body-parser");
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
 
 app.get("/proxy", (req, res) => {
   const imageUrl = req.query.url;
@@ -22,18 +24,18 @@ app.get("/user-info", (req, res) => {
 });
 
 app.post("/send-notification", async (req, res) => {
-  try {
-    const response = await axios.post(
-      "https://exp.host/--/api/v2/push/send",
-      req.body,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    res.status(200).json(response.data);
-  } catch (error) {
-    console.error("Error sending notification:", error.message);
-    res.status(500).json({ error: "Failed to send notification" });
+  const response = await fetch("https://exp.host/--/api/v2/push/send", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(req.body),
+  });
+
+  if (response.status === 200) {
+    const res = await response.json();
+    console.log(res);
   }
 });
 
