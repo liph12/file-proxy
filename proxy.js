@@ -24,14 +24,17 @@ app.get("/user-info", (req, res) => {
 });
 
 app.post("/send-notification", async (req, res) => {
-  const response = await fetch("https://exp.host/--/api/v2/push/send", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(req.body),
-  });
+  const response = await fetch(
+    "https://api.expo.dev/v2/push/send?useFcmV1=true",
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    }
+  );
 
   if (response.status === 200) {
     const res = await response.json();
