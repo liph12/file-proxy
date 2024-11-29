@@ -24,21 +24,43 @@ app.get("/user-info", (req, res) => {
 });
 
 app.post("/send-notification", async (req, res) => {
-  const response = await fetch(
-    "https://api.expo.dev/v2/push/send?useFcmV1=true",
-    {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req.body),
-    }
-  );
+  try {
+    const response = await fetch(
+      "https://api.expo.dev/v2/push/send?useFcmV1=true",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body),
+      }
+    );
 
-  if (response.status === 200) {
-    const res = await response.json();
-    console.log(res);
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      res.status(200).json({
+        success: true,
+        message: "Notification sent successfully",
+        data,
+      });
+    } else {
+      const error = await response.json();
+      console.error("Error from Expo API:", error);
+      res.status(response.status).json({
+        success: false,
+        message: "Failed to send notification",
+        error,
+      });
+    }
+  } catch (err) {
+    console.error("Error in /send-notification:", err);
+    res.status(500).json({
+      success: false,
+      message: "An internal server error occurred",
+      error: err.message,
+    });
   }
 });
 
